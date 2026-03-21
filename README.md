@@ -1,17 +1,56 @@
-# digital_binder
+# 📱 Digital Binder
 
-A new Flutter project.
+A simple Flutter application that demonstrates a basic mobile app structure with a splash screen, navigation, and organized project architecture.
 
-## Getting Started
+This project was created to practice **Flutter fundamentals**, including widget structure, navigation, asset management, and widget testing.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Features
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- 🎬 **Splash Screen**
+  - Full screen splash displayed when the app starts
+  - Automatic navigation to the Home screen after a short delay
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 🏠 **Home Screen**
+  - Simple home page structure ready to be expanded
+  - Clean UI using Material components
+
+- 🧪 **Widget Tests**
+  - Basic Flutter widget tests implemented
+
+- 📂 **Organized Project Structure**
+  - Separation of views and assets
+  - Scalable folder architecture
+
+---
+
+Assets are configured in `pubspec.yaml`.
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the repository
+
+```bash
+git clone https://github.com/your-username/digital_binder.git
+```
+
+### 2️⃣ Navigate to the project
+
+```bash
+cd digital_binder
+```
+
+### 3️⃣ Install dependencies
+
+```bash
+flutter pub get
+```
+
+### 4️⃣ Run the application
+
+```bash
+flutter run
+```
