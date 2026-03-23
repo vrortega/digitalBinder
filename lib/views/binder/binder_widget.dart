@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'photo_card.dart';
 
 class BinderWidget extends StatelessWidget {
-  const BinderWidget({super.key});
+
+  final List<File?> cards;
+
+  const BinderWidget({
+    super.key,
+    required this.cards,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,48 +25,32 @@ class BinderWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(28),
           ),
           child: Row(
-            children: const [
-              Expanded(child: BinderPage()),
-              SizedBox(width: 16),
-              Expanded(child: BinderPage()),
+            children: [
+
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(child: PhotoCard(image: cards[0])),
+                    const SizedBox(height: 16),
+                    Expanded(child: PhotoCard(image: cards[1])),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 16),
+
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(child: PhotoCard(image: cards[2])),
+                    const SizedBox(height: 16),
+                    Expanded(child: PhotoCard(image: cards[3])),
+                  ],
+                ),
+              ),
+
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class BinderPage extends StatelessWidget {
-  const BinderPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        Expanded(child: PhotoCard()),
-        SizedBox(height: 16),
-        Expanded(child: PhotoCard()),
-      ],
-    );
-  }
-}
-
-class PhotoCard extends StatelessWidget {
-  const PhotoCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFE0E0E0),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.image,
-          size: 40,
-          color: Colors.grey,
         ),
       ),
     );
