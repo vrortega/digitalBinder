@@ -1,5 +1,5 @@
 name: digital_binder
-description: "A new Flutter project."
+description: A photocard binder app built with Flutter.
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -10,23 +10,36 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   cupertino_icons: ^1.0.8
   image_picker: ^1.0.7
-
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
   flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/splash.png
+    - assets/images/
+    - assets/icon/
 
+# Splash screen
 flutter_native_splash:
   color: "#F4EFEA"
+  image: assets/images/splash.png
   android: true
   ios: true
+  android_gravity: center
+  ios_content_mode: center
+
+# App icon
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/logo.png
