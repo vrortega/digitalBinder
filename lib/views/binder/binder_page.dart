@@ -50,15 +50,18 @@ class _BinderPageState extends State<BinderPage> {
     );
   }
 
-void onCardTap(int index) {
-  final action = viewModel.onCardTap(index);
-  if (action == CardAction.addImage) {
-    viewModel.pickImage(index).then((_) => setState(() {}));
+  void onCardTap(int index) {
+
+    final action = viewModel.onCardTap(index);
+
+    if (action == CardAction.addImage) {
+      viewModel.pickImage(index).then((_) => setState(() {}));
+    }
+
+    if (action == CardAction.openMenu) {
+      openCardMenu(index);
+    }
   }
-  if (action == CardAction.openMenu) {
-    openCardMenu(index);
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +79,15 @@ void onCardTap(int index) {
         child: BinderWidget(
           cards: viewModel.cards,
           onCardTap: onCardTap,
+          onNextPage: () {
+            viewModel.nextPage();
+            setState(() {});
+          },
+          onPreviousPage: () {
+            viewModel.previousPage();
+            setState(() {});
+          },
+          hasPreviousPage: viewModel.hasPreviousPage,
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../models/binder_model.dart';
 
 enum CardAction {
   addImage,
@@ -12,12 +11,16 @@ class BinderViewModel extends ChangeNotifier {
 
   final ImagePicker picker = ImagePicker();
 
-  BinderModel binder = BinderModel();
+  List<List<File?>> pages = [
+    [null, null, null, null],
+  ];
 
-  List<File?> get cards => binder.cards;
+  int currentPage = 0;
+
+  List<File?> get cards => pages[currentPage];
 
   CardAction onCardTap(int index) {
-    if (binder.cards[index] == null) {
+    if (cards[index] == null) {
       return CardAction.addImage;
     } else {
       return CardAction.openMenu;
@@ -31,13 +34,33 @@ class BinderViewModel extends ChangeNotifier {
     );
 
     if (image != null) {
-      binder.cards[index] = File(image.path);
+      pages[currentPage][index] = File(image.path);
       notifyListeners();
     }
   }
 
   void deleteCard(int index) {
-    binder.cards[index] = null;
+    pages[currentPage][index] = null;
     notifyListeners();
   }
+
+  void nextPage() {
+
+    if (currentPage == pages.length - 1) {
+      pages.add([null, null, null, null]);
+    }
+
+    currentPage++;
+    notifyListeners();
+  }
+
+  void previousPage() {
+
+    if (currentPage > 0) {
+      currentPage--;
+      notifyListeners();
+    }
+  }
+
+  bool get hasPreviousPage => currentPage > 0;
 }
