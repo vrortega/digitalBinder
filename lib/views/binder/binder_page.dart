@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'binder_widget.dart';
+import 'package:digital_binder/viewmodels/binder_viewmodel.dart';
+import 'package:digital_binder/views/binder/binder_widget.dart';
 
 class BinderPage extends StatefulWidget {
   const BinderPage({super.key});
@@ -12,39 +11,14 @@ class BinderPage extends StatefulWidget {
 
 class _BinderPageState extends State<BinderPage> {
 
-  final ImagePicker picker = ImagePicker();
-
-  List<File?> cards = [
-    null,
-    null,
-    null,
-    null,
-  ];
-
-  Future<void> pickImage(int index) async {
-
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
-
-    if (image != null) {
-      setState(() {
-        cards[index] = File(image.path);
-      });
-    }
-  }
-
-  void deleteCard(int index) {
-    setState(() {
-      cards[index] = null;
-    });
-  }
+  final BinderViewModel viewModel = BinderViewModel();
 
   void openCardMenu(int index) {
 
     showModalBottomSheet(
       context: context,
       builder: (context) {
+
         return SafeArea(
           child: Wrap(
             children: [
@@ -54,7 +28,7 @@ class _BinderPageState extends State<BinderPage> {
                 title: const Text("Replace image"),
                 onTap: () {
                   Navigator.pop(context);
-                  pickImage(index);
+                  viewModel.pickImage(index).then((_) => setState(() {}));
                 },
               ),
 
@@ -63,26 +37,28 @@ class _BinderPageState extends State<BinderPage> {
                 title: const Text("Delete card"),
                 onTap: () {
                   Navigator.pop(context);
-                  deleteCard(index);
+                  viewModel.deleteCard(index);
+                  setState(() {});
                 },
               ),
 
             ],
           ),
         );
+
       },
     );
   }
 
-  void onCardTap(int index) {
-
-    if (cards[index] == null) {
-      pickImage(index);
-    } else {
-      openCardMenu(index);
-    }
-
+void onCardTap(int index) {
+  final action = viewModel.onCardTap(index);
+  if (action == CardAction.addImage) {
+    viewModel.pickImage(index).then((_) => setState(() {}));
   }
+  if (action == CardAction.openMenu) {
+    openCardMenu(index);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +74,7 @@ class _BinderPageState extends State<BinderPage> {
 
       body: Center(
         child: BinderWidget(
-          cards: cards,
+          cards: viewModel.cards,
           onCardTap: onCardTap,
         ),
       ),
