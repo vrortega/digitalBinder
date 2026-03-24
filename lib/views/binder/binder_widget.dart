@@ -5,10 +5,12 @@ import 'photo_card.dart';
 class BinderWidget extends StatelessWidget {
 
   final List<File?> cards;
+  final Function(int index) onCardTap;
 
   const BinderWidget({
     super.key,
     required this.cards,
+    required this.onCardTap,
   });
 
   @override
@@ -30,9 +32,19 @@ class BinderWidget extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    Expanded(child: PhotoCard(image: cards[0])),
+                    Expanded(
+                      child: PhotoCard(
+                        image: cards[0],
+                        onTap: () => onCardTap(0),
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    Expanded(child: PhotoCard(image: cards[1])),
+                    Expanded(
+                      child: PhotoCard(
+                        image: cards[1],
+                        onTap: () => onCardTap(1),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -42,9 +54,19 @@ class BinderWidget extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    Expanded(child: PhotoCard(image: cards[2])),
+                    Expanded(
+                      child: PhotoCard(
+                        image: cards[2],
+                        onTap: () => onCardTap(2),
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    Expanded(child: PhotoCard(image: cards[3])),
+                    Expanded(
+                      child: PhotoCard(
+                        image: cards[3],
+                        onTap: () => onCardTap(3),
+                      ),
+                    ),
                   ],
                 ),
               ),

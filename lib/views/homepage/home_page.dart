@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
     null,
   ];
 
-  Future<void> pickImage() async {
+  Future<void> pickImage(int index) async {
 
     final XFile? image = await picker.pickImage(
       source: ImageSource.gallery,
@@ -29,20 +29,23 @@ class _HomePageState extends State<HomePage> {
 
     if (image != null) {
 
-      final file = File(image.path);
-
       setState(() {
-        int index = cards.indexWhere((c) => c == null);
-
-        if (index != -1) {
-          cards[index] = file;
-        }
+        cards[index] = File(image.path);
       });
 
     }
   }
 
-  void openMenu() {
+  void deleteCard(int index) {
+
+    setState(() {
+      cards[index] = null;
+    });
+
+  }
+
+  void openCardMenu(int index) {
+
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -51,23 +54,59 @@ class _HomePageState extends State<HomePage> {
             children: [
 
               ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Add card image"),
+                leading: const Icon(Icons.photo),
+                title: const Text("Replace image"),
                 onTap: () {
                   Navigator.pop(context);
-                  pickImage();
+                  pickImage(index);
                 },
               ),
 
-              const ListTile(
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text("Delete card"),
+                onTap: () {
+                  Navigator.pop(context);
+                  deleteCard(index);
+                },
+              ),
+
+            ],
+          ),
+        );
+      },
+    );
+
+  }
+
+  void onCardTap(int index) {
+
+    if (cards[index] == null) {
+      pickImage(index);
+    } else {
+      openCardMenu(index);
+    }
+
+  }
+
+  void openMenu() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: const [
+
+              ListTile(
                 leading: Icon(Icons.star_border),
                 title: Text("Add wishlist card"),
               ),
 
-              const ListTile(
+              ListTile(
                 leading: Icon(Icons.swap_vert),
                 title: Text("Rearrange cards"),
               ),
+
             ],
           ),
         );
@@ -77,11 +116,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4EFEA),
 
       body: Center(
-        child: BinderWidget(cards: cards),
+        child: BinderWidget(
+          cards: cards,
+          onCardTap: onCardTap,
+        ),
       ),
 
       floatingActionButton: FloatingActionButton(
