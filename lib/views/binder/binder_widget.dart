@@ -19,9 +19,9 @@ class BinderWidget extends StatelessWidget {
       color: const Color(0xFFF4EFEA),
       child: Center(
         child: Container(
-          width: 340,
-          height: 420,
-          padding: const EdgeInsets.all(20),
+          width: 360,
+          height: 480,
+          padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
             color: const Color(0xFFF9F7F5),
             borderRadius: BorderRadius.circular(28),
