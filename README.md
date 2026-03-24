@@ -1,40 +1,51 @@
 # 📱 Digital Binder
 
-A simple Flutter application that demonstrates a basic mobile app structure with a splash screen, navigation, and organized project architecture.
+A Flutter application that simulates a **photocard binder**, allowing users to create a binder and add, replace, or remove images from card slots.
 
-This project was created to practice **Flutter fundamentals**, including widget structure, navigation, asset management, and widget testing.
-
----
-
-## ✨ Features
-
-- 🎬 **Splash Screen**
-  - Full screen splash displayed when the app starts
-  - Automatic navigation to the Home screen after a short delay
-
-- 🏠 **Home Screen**
-  - Simple home page structure ready to be expanded
-  - Clean UI using Material components
-
-- 🧪 **Widget Tests**
-  - Basic Flutter widget tests implemented
-
-- 📂 **Organized Project Structure**
-  - Separation of views and assets
-  - Scalable folder architecture
+This project was created to practice **Flutter architecture, UI composition, and state management**, following the **MVVM pattern** and a scalable project structure.
 
 ---
 
-Assets are configured in `pubspec.yaml`.
+# ✨ Features
+
+## 📖 Binder System
+
+- Create a **photocard binder**
+- Binder layout with **4 card slots**
+- Photocards displayed in a **realistic binder layout**
+
+Users can:
+
+- ➕ Add an image to an empty card slot
+- 🔄 Replace an existing photocard
+- 🗑 Delete a photocard
+
+Images are selected using the device gallery via **image_picker**.
 
 ---
+
+## 🧱 MVVM Architecture
+
+The project follows a **Model–View–ViewModel (MVVM)** structure:
+
+| Layer | Responsibility |
+|------|------|
+| **Model** | Data structure of the binder |
+| **ViewModel** | Business logic and state handling |
+| **Views** | UI screens |
+| **Widgets** | Reusable UI components |
+
+This separation keeps the code **clean, testable, and scalable**.
+
+---
+
 
 ## 🚀 Getting Started
 
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/your-username/digital_binder.git
+git clone https://github.com/vrortega/digital_binder.git
 ```
 
 ### 2️⃣ Navigate to the project
@@ -47,10 +58,4 @@ cd digital_binder
 
 ```bash
 flutter pub get
-```
-
-### 4️⃣ Run the application
-
-```bash
-flutter run
 ```
