@@ -68,5 +68,12 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>This app needs access to your photo library to add photos to the binder.</string>
+
+		<key>NSCameraUsageDescription</key>
+		<string>This app needs camera access to take photos for the binder.</string>
+
 	</dict>
 </plist>

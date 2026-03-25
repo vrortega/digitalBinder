@@ -1,11 +1,25 @@
-import 'dart:io';
-
 class BinderModel {
 
-  List<File?> cards;
+  final String id;
+  String name;
 
   BinderModel({
-    List<File?>? cards,
-  }) : cards = cards ?? [null, null, null, null];
+    required this.id,
+    required this.name,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+    };
+  }
+
+  factory BinderModel.fromJson(Map<String, dynamic> json) {
+    return BinderModel(
+      id: json["id"],
+      name: json["name"],
+    );
+  }
 
 }

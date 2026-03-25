@@ -97,22 +97,20 @@ class BinderWidget extends StatelessWidget {
               ),
             ),
 
-            /// BOTÃO ESQUERDA
             if (hasPreviousPage)
               Positioned(
                 left: -10,
                 child: IconButton(
-                  iconSize: 22,
+                  iconSize: 18,
                   icon: const Icon(Icons.arrow_back_ios),
                   onPressed: onPreviousPage,
                 ),
               ),
 
-            /// BOTÃO DIREITA
             Positioned(
               right: -10,
               child: IconButton(
-                iconSize: 22,
+                iconSize: 18,
                 icon: const Icon(Icons.arrow_forward_ios),
                 onPressed: onNextPage,
               ),
