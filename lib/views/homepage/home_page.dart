@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/binder_model.dart';
@@ -74,6 +75,93 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget binderCard(BinderModel binder) {
+
+    return GestureDetector(
+      onTap: () {
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BinderPage(
+              binderId: binder.id,
+            ),
+          ),
+        ).then((_) {
+          loadBinders();
+        });
+
+      },
+
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 10,
+        ),
+
+        padding: const EdgeInsets.all(14),
+
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9F7F5),
+          borderRadius: BorderRadius.circular(16),
+        ),
+
+        child: Row(
+          children: [
+
+            /// PREVIEW
+            Container(
+              width: 60,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.grey[200],
+              ),
+
+              child: binder.preview != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        File(binder.preview!),
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : const Icon(Icons.photo),
+            ),
+
+            const SizedBox(width: 16),
+
+            /// INFO
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Text(
+                  binder.name,
+                  style: const TextStyle(
+                    fontFamily: "Sora",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  "${binder.cardCount} cards",
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -84,33 +172,16 @@ class _HomePageState extends State<HomePage> {
           ? const Center(
               child: Text(
                 "No binders yet",
-                style: TextStyle(fontSize: 18, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
               ),
             )
           : ListView.builder(
               itemCount: binders.length,
               itemBuilder: (context, index) {
-
-                final binder = binders[index];
-
-                return ListTile(
-                  leading: const Icon(Icons.menu_book),
-                  title: Text(binder.name),
-                  onTap: () {
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BinderPage(
-                          binderId: binder.id,
-                        ),
-                      ),
-                    ).then((_) {
-                      loadBinders();
-                    });
-
-                  },
-                );
+                return binderCard(binders[index]);
               },
             ),
 

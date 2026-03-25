@@ -38,7 +38,6 @@ class BinderViewModel extends ChangeNotifier {
     }
   }
 
-  /// salva imagem no storage interno do app
   Future<File> saveImageToAppStorage(File image) async {
 
     final directory = await getApplicationDocumentsDirectory();
@@ -113,7 +112,6 @@ class BinderViewModel extends ChangeNotifier {
 
   bool get hasPreviousPage => currentPage > 0;
 
-  /// SALVAR BINDER
 
   Future<void> saveBinder() async {
 
@@ -124,6 +122,33 @@ class BinderViewModel extends ChangeNotifier {
     }).toList();
 
     await prefs.setString('binder_$binderId', jsonEncode(data));
+
+    int cardCount = 0;
+    String? preview;
+
+    for (var page in pages) {
+      for (var file in page) {
+        if (file != null) {
+          cardCount++;
+          preview ??= file.path;
+        }
+      }
+    }
+
+    final jsonString = prefs.getString("binders");
+
+    if (jsonString == null) return;
+
+    List decoded = jsonDecode(jsonString);
+
+    for (var binder in decoded) {
+      if (binder["id"] == binderId) {
+        binder["cardCount"] = cardCount;
+        binder["preview"] = preview;
+      }
+    }
+
+    await prefs.setString("binders", jsonEncode(decoded));
   }
 
   /// CARREGAR BINDER
