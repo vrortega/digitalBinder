@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import '../../models/binder_model.dart';
+import '../../viewmodels/home_viewmodel.dart';
 import '../binder/binder_page.dart';
+import '../binder/binder_previewcard.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,208 +12,115 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List<BinderModel> binders = [];
+  late HomeViewModel viewModel;
 
   @override
   void initState() {
     super.initState();
-    loadBinders();
+    viewModel = HomeViewModel();
   }
 
-  Future<void> loadBinders() async {
+  Future<bool> showDeleteDialog() async {
 
-    final prefs = await SharedPreferences.getInstance();
+    return await showDialog(
+      context: context,
+      builder: (context) {
 
-    final jsonString = prefs.getString("binders");
+        return AlertDialog(
+          title: const Text("Delete binder"),
+          content: const Text("Are you sure you want to delete this binder?"),
+          actions: [
 
-    if (jsonString == null) return;
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel"),
+            ),
 
-    final List decoded = jsonDecode(jsonString);
-
-    binders = decoded.map((e) => BinderModel.fromJson(e)).toList();
-
-    setState(() {});
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 
-  Future<void> saveBinders() async {
-
-    final prefs = await SharedPreferences.getInstance();
-
-    final json = jsonEncode(
-      binders.map((e) => e.toJson()).toList(),
-    );
-
-    await prefs.setString("binders", json);
-  }
-
-  Future<void> createBinder() async {
-
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-
-    final binder = BinderModel(
-      id: id,
-      name: "New Binder",
-    );
-
-    binders.add(binder);
-
-    await saveBinders();
-
-    if (!mounted) return;
-
+  void openBinder(String id) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BinderPage(
-          binderId: binder.id,
-        ),
+        builder: (_) => BinderPage(binderId: id),
       ),
     ).then((_) {
-      loadBinders();
+      viewModel.loadBinders();
     });
-  }
-
-  /// 🔥 reconstrói o arquivo a partir do fileName
-  Future<File?> getPreviewFile(String? fileName) async {
-    if (fileName == null) return null;
-
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/binder_images/$fileName');
-
-    if (await file.exists()) {
-      return file;
-    }
-
-    return null;
-  }
-
-  Widget binderCard(BinderModel binder) {
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BinderPage(
-              binderId: binder.id,
-            ),
-          ),
-        ).then((_) {
-          loadBinders();
-        });
-      },
-
-      child: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 10,
-        ),
-
-        padding: const EdgeInsets.all(14),
-
-        decoration: BoxDecoration(
-          color: const Color(0xFFF9F7F5),
-          borderRadius: BorderRadius.circular(16),
-        ),
-
-        child: Row(
-          children: [
-
-            Container(
-              width: 60,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey[200],
-              ),
-
-              child: FutureBuilder<File?>(
-                future: getPreviewFile(binder.preview),
-                builder: (context, snapshot) {
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const SizedBox();
-                  }
-
-                  final file = snapshot.data;
-
-                  if (file != null) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        file,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-
-                  return const Icon(Icons.photo);
-                },
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                Text(
-                  binder.name,
-                  style: const TextStyle(
-                    fontFamily: "Sora",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                Text(
-                  "${binder.cardCount} cards",
-                  style: const TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-
-              ],
-            )
-          ],
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4EFEA),
+    return AnimatedBuilder(
+      animation: viewModel,
+      builder: (context, _) {
 
-      body: binders.isEmpty
-          ? const Center(
-              child: Text(
-                "No binders yet",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey,
+        if (viewModel.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF4EFEA),
+
+          body: viewModel.binders.isEmpty
+              ? const Center(
+                  child: Text(
+                    "No binders yet",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: viewModel.binders.length,
+                  itemBuilder: (context, index) {
+
+                    final binder = viewModel.binders[index];
+
+                    return BinderCardWidget(
+                      binder: binder,
+
+                      onTap: () => openBinder(binder.id),
+
+                      onDeleteConfirm: () async {
+                        final confirm = await showDeleteDialog();
+
+                        if (confirm) {
+                          await viewModel.deleteBinder(binder.id);
+                        }
+
+                        return confirm;
+                      },
+                    );
+                  },
                 ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: binders.length,
-              itemBuilder: (context, index) {
-                return binderCard(binders[index]);
-              },
-            ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: createBinder,
-        backgroundColor: const Color(0xFFD8CFC7),
-        child: const Icon(Icons.add),
-      ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              final binder = await viewModel.createBinder();
+
+              if (!mounted) return;
+
+              openBinder(binder.id);
+            },
+            backgroundColor: const Color(0xFFD8CFC7),
+            child: const Icon(Icons.add),
+          ),
+
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+        );
+      },
     );
   }
 }
