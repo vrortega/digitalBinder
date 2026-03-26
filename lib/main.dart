@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'views/homepage/home_page.dart';
-// import 'views/splash/splash_screen.dart';
+//import 'views/splash/splash_screen.dart';
 
 void main() {
   runApp(const DigitalBinderApp());

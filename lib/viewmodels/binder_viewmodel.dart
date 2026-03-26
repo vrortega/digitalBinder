@@ -16,7 +16,7 @@ class BinderViewModel extends ChangeNotifier {
 
   final ImagePicker picker = ImagePicker();
 
-  List<List<File?>> pages = [
+  List<List<String?>> pages = [
     [null, null, null, null],
   ];
 
@@ -28,33 +28,56 @@ class BinderViewModel extends ChangeNotifier {
     loadBinder();
   }
 
-  List<File?> get cards => pages[currentPage];
+  List<File?> get cards {
+    return pages[currentPage].map((fileName) {
+      if (fileName == null) return null;
 
-  CardAction onCardTap(int index) {
-    if (cards[index] == null) {
-      return CardAction.addImage;
-    } else {
-      return CardAction.openMenu;
-    }
+      final directory = Directory(
+        '${_appDir.path}/binder_images',
+      );
+
+      final file = File('${directory.path}/$fileName');
+
+      if (file.existsSync()) {
+        return file;
+      }
+
+      return null;
+    }).toList();
   }
 
-  Future<File> saveImageToAppStorage(File image) async {
+  late Directory _appDir;
 
-    final directory = await getApplicationDocumentsDirectory();
+  Future<void> _initDir() async {
+    _appDir = await getApplicationDocumentsDirectory();
+  }
 
-    final imagesDir = Directory('${directory.path}/binder_images');
+  CardAction onCardTap(int index) {
+    return cards[index] == null
+        ? CardAction.addImage
+        : CardAction.openMenu;
+  }
+
+  Future<String> saveImageToAppStorage(File image) async {
+
+    final imagesDir = Directory('${_appDir.path}/binder_images');
 
     if (!await imagesDir.exists()) {
       await imagesDir.create(recursive: true);
     }
 
-    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final fileName =
+        "${DateTime.now().millisecondsSinceEpoch}.jpg";
 
-    final newImage = await image.copy(
-      '${imagesDir.path}/$fileName.jpg',
-    );
+    final newPath = '${imagesDir.path}/$fileName';
 
-    return newImage;
+    final newImage = await image.copy(newPath);
+
+    if (!await newImage.exists()) {
+      throw Exception("Erro ao salvar imagem");
+    }
+
+    return fileName;
   }
 
   Future<void> pickImage(int index) async {
@@ -67,9 +90,10 @@ class BinderViewModel extends ChangeNotifier {
 
     final File original = File(image.path);
 
-    final File savedImage = await saveImageToAppStorage(original);
+    final fileName =
+        await saveImageToAppStorage(original);
 
-    pages[currentPage][index] = savedImage;
+    pages[currentPage][index] = fileName;
 
     await saveBinder();
 
@@ -78,10 +102,16 @@ class BinderViewModel extends ChangeNotifier {
 
   Future<void> deleteCard(int index) async {
 
-    final file = pages[currentPage][index];
+    final fileName = pages[currentPage][index];
 
-    if (file != null && await file.exists()) {
-      await file.delete();
+    if (fileName != null) {
+      final file = File(
+        '${_appDir.path}/binder_images/$fileName',
+      );
+
+      if (await file.exists()) {
+        await file.delete();
+      }
     }
 
     pages[currentPage][index] = null;
@@ -92,18 +122,15 @@ class BinderViewModel extends ChangeNotifier {
   }
 
   void nextPage() {
-
     if (currentPage == pages.length - 1) {
       pages.add([null, null, null, null]);
     }
 
     currentPage++;
-
     notifyListeners();
   }
 
   void previousPage() {
-
     if (currentPage > 0) {
       currentPage--;
       notifyListeners();
@@ -112,25 +139,29 @@ class BinderViewModel extends ChangeNotifier {
 
   bool get hasPreviousPage => currentPage > 0;
 
-
   Future<void> saveBinder() async {
 
     final prefs = await SharedPreferences.getInstance();
 
-    List<List<String?>> data = pages.map((page) {
-      return page.map((file) => file?.path).toList();
-    }).toList();
-
-    await prefs.setString('binder_$binderId', jsonEncode(data));
+    await prefs.setString(
+      'binder_$binderId',
+      jsonEncode(pages),
+    );
 
     int cardCount = 0;
     String? preview;
 
     for (var page in pages) {
-      for (var file in page) {
-        if (file != null) {
-          cardCount++;
-          preview ??= file.path;
+      for (var fileName in page) {
+        if (fileName != null) {
+          final file = File(
+            '${_appDir.path}/binder_images/$fileName',
+          );
+
+          if (file.existsSync()) {
+            cardCount++;
+            preview ??= fileName;
+          }
         }
       }
     }
@@ -144,38 +175,39 @@ class BinderViewModel extends ChangeNotifier {
     for (var binder in decoded) {
       if (binder["id"] == binderId) {
         binder["cardCount"] = cardCount;
-        binder["preview"] = preview;
+        binder["preview"] = preview; 
       }
     }
 
     await prefs.setString("binders", jsonEncode(decoded));
   }
 
-  /// CARREGAR BINDER
-
   Future<void> loadBinder() async {
+
+    await _initDir();
 
     final prefs = await SharedPreferences.getInstance();
 
-    final jsonString = prefs.getString('binder_$binderId');
+    final jsonString =
+        prefs.getString('binder_$binderId');
 
     if (jsonString != null) {
 
       List decoded = jsonDecode(jsonString);
 
-      pages = decoded.map<List<File?>>((page) {
+      pages = decoded.map<List<String?>>((page) {
 
-        return (page as List).map<File?>((path) {
+        return (page as List).map<String?>((fileName) {
 
-          if (path == null) return null;
+          if (fileName == null) return null;
 
-          final file = File(path);
+          final file = File(
+            '${_appDir.path}/binder_images/$fileName',
+          );
 
-          if (!file.existsSync()) {
-            return null;
-          }
+          if (!file.existsSync()) return null;
 
-          return file;
+          return fileName;
 
         }).toList();
 
@@ -183,7 +215,6 @@ class BinderViewModel extends ChangeNotifier {
     }
 
     isLoading = false;
-
     notifyListeners();
   }
 }

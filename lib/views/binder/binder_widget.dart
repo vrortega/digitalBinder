@@ -30,7 +30,6 @@ class BinderWidget extends StatelessWidget {
           alignment: Alignment.center,
           children: [
 
-            /// BINDER
             Container(
               width: 320,
               height: 480,

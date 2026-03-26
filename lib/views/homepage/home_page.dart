@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../models/binder_model.dart';
 import '../binder/binder_page.dart';
 
@@ -75,11 +76,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// 🔥 reconstrói o arquivo a partir do fileName
+  Future<File?> getPreviewFile(String? fileName) async {
+    if (fileName == null) return null;
+
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/binder_images/$fileName');
+
+    if (await file.exists()) {
+      return file;
+    }
+
+    return null;
+  }
+
   Widget binderCard(BinderModel binder) {
 
     return GestureDetector(
       onTap: () {
-
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -90,7 +104,6 @@ class _HomePageState extends State<HomePage> {
         ).then((_) {
           loadBinders();
         });
-
       },
 
       child: Container(
@@ -109,7 +122,6 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           children: [
 
-            /// PREVIEW
             Container(
               width: 60,
               height: 80,
@@ -118,20 +130,33 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.grey[200],
               ),
 
-              child: binder.preview != null
-                  ? ClipRRect(
+              child: FutureBuilder<File?>(
+                future: getPreviewFile(binder.preview),
+                builder: (context, snapshot) {
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox();
+                  }
+
+                  final file = snapshot.data;
+
+                  if (file != null) {
+                    return ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.file(
-                        File(binder.preview!),
+                        file,
                         fit: BoxFit.cover,
                       ),
-                    )
-                  : const Icon(Icons.photo),
+                    );
+                  }
+
+                  return const Icon(Icons.photo);
+                },
+              ),
             ),
 
             const SizedBox(width: 16),
 
-            /// INFO
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
