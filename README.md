@@ -6,6 +6,12 @@ This project was created to practice **Flutter architecture, UI composition, and
 
 ---
 
+# Preview
+
+
+https://github.com/user-attachments/assets/24619f56-bdb6-4d39-9a5f-fa569b0b2e04
+
+
 # ✨ Features
 
 ## 📖 Binder System
