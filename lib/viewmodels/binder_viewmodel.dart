@@ -58,6 +58,17 @@ class BinderViewModel extends ChangeNotifier {
         : CardAction.openMenu;
   }
 
+    Future<void> reorderCards(int oldIndex, int newIndex) async {
+    final page = pages[currentPage];
+
+    final item = page[oldIndex];
+    page[oldIndex] = page[newIndex];
+    page[newIndex] = item;
+
+    await saveBinder();
+    notifyListeners();
+  }
+
   Future<String> saveImageToAppStorage(File image) async {
 
     final imagesDir = Directory('${_appDir.path}/binder_images');

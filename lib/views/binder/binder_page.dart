@@ -5,7 +5,6 @@ import 'package:digital_binder/viewmodels/binder_viewmodel.dart';
 import 'package:digital_binder/views/binder/binder_widget.dart';
 
 class BinderPage extends StatefulWidget {
-
   final String binderId;
 
   const BinderPage({
@@ -18,7 +17,6 @@ class BinderPage extends StatefulWidget {
 }
 
 class _BinderPageState extends State<BinderPage> {
-
   late final BinderViewModel viewModel;
 
   String binderName = "New Binder";
@@ -35,7 +33,6 @@ class _BinderPageState extends State<BinderPage> {
   }
 
   Future<void> loadBinderName() async {
-
     final prefs = await SharedPreferences.getInstance();
 
     final jsonString = prefs.getString("binders");
@@ -56,7 +53,6 @@ class _BinderPageState extends State<BinderPage> {
   }
 
   Future<void> saveBinderName(String name) async {
-
     final prefs = await SharedPreferences.getInstance();
 
     final jsonString = prefs.getString("binders");
@@ -81,15 +77,12 @@ class _BinderPageState extends State<BinderPage> {
   }
 
   void openCardMenu(int index) {
-
     showModalBottomSheet(
       context: context,
       builder: (context) {
-
         return SafeArea(
           child: Wrap(
             children: [
-
               ListTile(
                 leading: const Icon(Icons.photo),
                 title: const Text("Replace image"),
@@ -98,7 +91,6 @@ class _BinderPageState extends State<BinderPage> {
                   viewModel.pickImage(index);
                 },
               ),
-
               ListTile(
                 leading: const Icon(Icons.delete),
                 title: const Text("Delete card"),
@@ -107,17 +99,14 @@ class _BinderPageState extends State<BinderPage> {
                   viewModel.deleteCard(index);
                 },
               ),
-
             ],
           ),
         );
-
       },
     );
   }
 
   void onCardTap(int index) {
-
     final action = viewModel.onCardTap(index);
 
     if (action == CardAction.addImage) {
@@ -130,7 +119,6 @@ class _BinderPageState extends State<BinderPage> {
   }
 
   Widget buildTitle() {
-
     if (isEditing) {
       return TextField(
         controller: nameController,
@@ -162,11 +150,9 @@ class _BinderPageState extends State<BinderPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return AnimatedBuilder(
       animation: viewModel,
       builder: (context, _) {
-
         if (viewModel.isLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -175,17 +161,16 @@ class _BinderPageState extends State<BinderPage> {
 
         return Scaffold(
           backgroundColor: const Color(0xFFF4EFEA),
-
           appBar: AppBar(
             title: buildTitle(),
             backgroundColor: const Color(0xFFF4EFEA),
             elevation: 0,
           ),
-
           body: Center(
             child: BinderWidget(
               cards: viewModel.cards,
               onCardTap: onCardTap,
+              onReorder: viewModel.reorderCards, 
               onNextPage: viewModel.nextPage,
               onPreviousPage: viewModel.previousPage,
               hasPreviousPage: viewModel.hasPreviousPage,

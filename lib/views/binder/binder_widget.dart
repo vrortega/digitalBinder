@@ -6,6 +6,7 @@ class BinderWidget extends StatelessWidget {
 
   final List<File?> cards;
   final Function(int index) onCardTap;
+  final Function(int oldIndex, int newIndex) onReorder;
   final VoidCallback onNextPage;
   final VoidCallback onPreviousPage;
   final bool hasPreviousPage;
@@ -14,10 +15,66 @@ class BinderWidget extends StatelessWidget {
     super.key,
     required this.cards,
     required this.onCardTap,
+    required this.onReorder,
     required this.onNextPage,
     required this.onPreviousPage,
     required this.hasPreviousPage,
   });
+
+  Widget buildDraggableCard(int index) {
+    return DragTarget<int>(
+      onAcceptWithDetails: (details) {
+        final fromIndex = details.data;
+
+        if (fromIndex != index) {
+          onReorder(fromIndex, index);
+        }
+      },
+      builder: (context, candidateData, rejectedData) {
+
+        final isHovering = candidateData.isNotEmpty;
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            border: isHovering
+                ? Border.all(color: Colors.grey, width: 2)
+                : null,
+            borderRadius: BorderRadius.circular(10),
+          ),
+
+          child: Draggable<int>(
+            data: index,
+
+            feedback: Material(
+              color: Colors.transparent,
+              child: SizedBox(
+                width: 100,
+                height: 140,
+                child: PhotoCard(
+                  image: cards[index],
+                  onTap: () {},
+                ),
+              ),
+            ),
+
+            childWhenDragging: Opacity(
+              opacity: 0.3,
+              child: PhotoCard(
+                image: cards[index],
+                onTap: () => onCardTap(index),
+              ),
+            ),
+
+            child: PhotoCard(
+              image: cards[index],
+              onTap: () => onCardTap(index),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,23 +102,9 @@ class BinderWidget extends StatelessWidget {
                   Expanded(
                     child: Column(
                       children: [
-
-                        Expanded(
-                          child: PhotoCard(
-                            image: cards[0],
-                            onTap: () => onCardTap(0),
-                          ),
-                        ),
-
+                        Expanded(child: buildDraggableCard(0)),
                         const SizedBox(height: 16),
-
-                        Expanded(
-                          child: PhotoCard(
-                            image: cards[1],
-                            onTap: () => onCardTap(1),
-                          ),
-                        ),
-
+                        Expanded(child: buildDraggableCard(1)),
                       ],
                     ),
                   ),
@@ -71,23 +114,9 @@ class BinderWidget extends StatelessWidget {
                   Expanded(
                     child: Column(
                       children: [
-
-                        Expanded(
-                          child: PhotoCard(
-                            image: cards[2],
-                            onTap: () => onCardTap(2),
-                          ),
-                        ),
-
+                        Expanded(child: buildDraggableCard(2)),
                         const SizedBox(height: 16),
-
-                        Expanded(
-                          child: PhotoCard(
-                            image: cards[3],
-                            onTap: () => onCardTap(3),
-                          ),
-                        ),
-
+                        Expanded(child: buildDraggableCard(3)),
                       ],
                     ),
                   ),
@@ -114,7 +143,6 @@ class BinderWidget extends StatelessWidget {
                 onPressed: onNextPage,
               ),
             ),
-
           ],
         ),
       ),
