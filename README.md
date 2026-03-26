@@ -10,17 +10,28 @@ This project was created to practice **Flutter architecture, UI composition, and
 
 ## 📖 Binder System
 
-- Create a **photocard binder**
-- Binder layout with **4 card slots**
-- Photocards displayed in a **realistic binder layout**
+- Create multiple **photocard binders**
+- Each binder contains **multiple pages**
+- Each page has **4 card slots**
+- Swipe navigation between pages
 
 Users can:
 
 - ➕ Add an image to an empty card slot
 - 🔄 Replace an existing photocard
 - 🗑 Delete a photocard
+- 📂 Persist cards locally
 
 Images are selected using the device gallery via **image_picker**.
+
+---
+
+# ⚙️ Tech Stack
+- Flutter
+- Dart
+- image_picker
+- path_provider
+- shared_preferences
 
 ---
 
