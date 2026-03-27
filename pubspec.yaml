@@ -20,6 +20,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.2
+  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
@@ -33,3 +34,17 @@ flutter:
         - asset: assets/fonts/Sora-Regular.ttf
         - asset: assets/fonts/Sora-Bold.ttf
           weight: 700
+
+flutter_native_splash:
+  color: "#FCEED2"
+  image: assets/images/splash.png
+
+  android: true
+  ios: true
+
+  android_12:
+    color: "#FCEED2"
+    image: assets/images/splash.png
+
+  android_gravity: center
+  ios_content_mode: center
