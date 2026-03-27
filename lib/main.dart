@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
 import 'views/homepage/home_page.dart';
+import 'repositories/binder_repository.dart';
+import 'services/image_service.dart';
+import 'services/storage_service.dart';
 
 void main() {
-  runApp(const DigitalBinderApp());
+  final storage = StorageService();
+
+  runApp(
+    DigitalBinderApp(
+      repository: BinderRepository(storage),
+      imageService: ImageService(),
+    ),
+  );
 }
 
 class DigitalBinderApp extends StatelessWidget {
-  const DigitalBinderApp({super.key});
+  final BinderRepository repository;
+  final ImageService imageService;
+
+  const DigitalBinderApp({
+    super.key,
+    required this.repository,
+    required this.imageService,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +33,10 @@ class DigitalBinderApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(),
+      home: HomePage(
+        repository: repository,
+        imageService: imageService,
+      ),
     );
   }
 }

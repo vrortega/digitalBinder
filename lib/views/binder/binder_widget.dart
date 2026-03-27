@@ -25,7 +25,6 @@ class BinderWidget extends StatelessWidget {
       onAcceptWithDetails: (details) {
         final fromIndex = details.data;
 
-        // 🔒 proteção extra: não deixa mover slot vazio
         if (cards[fromIndex] == null) return;
 
         if (fromIndex != index) {
@@ -43,11 +42,9 @@ class BinderWidget extends StatelessWidget {
                 : null,
             borderRadius: BorderRadius.circular(10),
           ),
-
           child: cards[index] != null
               ? Draggable<int>(
                   data: index,
-
                   feedback: Material(
                     color: Colors.transparent,
                     child: SizedBox(
@@ -59,7 +56,6 @@ class BinderWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   childWhenDragging: Opacity(
                     opacity: 0.3,
                     child: PhotoCard(
@@ -67,7 +63,6 @@ class BinderWidget extends StatelessWidget {
                       onTap: () => onCardTap(index),
                     ),
                   ),
-
                   child: PhotoCard(
                     image: cards[index],
                     onTap: () => onCardTap(index),
@@ -87,61 +82,65 @@ class BinderWidget extends StatelessWidget {
     return Container(
       color: const Color(0xFFF4EFEA),
       child: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 320,
-              height: 480,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9F7F5),
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Expanded(child: buildDraggableCard(0)),
-                        const SizedBox(height: 16),
-                        Expanded(child: buildDraggableCard(1)),
-                      ],
+        child: SizedBox(
+          width: 380, 
+          height: 480,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 320,
+                height: 480,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F7F5),
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Expanded(child: buildDraggableCard(0)),
+                          const SizedBox(height: 16),
+                          Expanded(child: buildDraggableCard(1)),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Expanded(child: buildDraggableCard(2)),
-                        const SizedBox(height: 16),
-                        Expanded(child: buildDraggableCard(3)),
-                      ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Expanded(child: buildDraggableCard(2)),
+                          const SizedBox(height: 16),
+                          Expanded(child: buildDraggableCard(3)),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            if (hasPreviousPage)
-              Positioned(
-                left: -10,
-                child: IconButton(
-                  iconSize: 18,
-                  icon: const Icon(Icons.arrow_back_ios),
-                  onPressed: onPreviousPage,
+                  ],
                 ),
               ),
 
-            Positioned(
-              right: -10,
-              child: IconButton(
-                iconSize: 18,
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: onNextPage,
+              if (hasPreviousPage)
+                Positioned(
+                  left: -5,
+                  child: IconButton(
+                    iconSize: 20,
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: onPreviousPage,
+                  ),
+                ),
+
+              Positioned(
+                right: -5,
+                child: IconButton(
+                  iconSize: 20,
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  onPressed: onNextPage,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

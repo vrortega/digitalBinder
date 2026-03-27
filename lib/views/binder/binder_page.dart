@@ -1,8 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:digital_binder/viewmodels/binder_viewmodel.dart';
 import 'package:digital_binder/views/binder/binder_widget.dart';
+
+import '../../services/image_service.dart';
+import '../../services/storage_service.dart';
+import '../../services/picker_service.dart';
+import '../../services/binder_service.dart';
+import '../../repositories/binder_repository.dart';
+import '../../models/binder_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class BinderPage extends StatefulWidget {
   final String binderId;
@@ -20,42 +28,45 @@ class _BinderPageState extends State<BinderPage> {
   late final BinderViewModel viewModel;
 
   String binderName = "New Binder";
-
   bool isEditing = false;
-
   late TextEditingController nameController;
+
+  final storage = StorageService();
 
   @override
   void initState() {
     super.initState();
-    viewModel = BinderViewModel(widget.binderId);
-    loadBinderName();
+
+    viewModel = BinderViewModel(
+      binderId: widget.binderId,
+      repository: BinderRepository(storage),
+      imageService: ImageService(),
+      pickerService: PickerService(ImagePicker()),
+      binderService: BinderService(),
+    );
+
+    _loadBinderName();
   }
 
-  Future<void> loadBinderName() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final jsonString = prefs.getString("binders");
+  Future<void> _loadBinderName() async {
+    final jsonString = await storage.getString("binders");
 
     if (jsonString == null) return;
 
     final List decoded = jsonDecode(jsonString);
 
-    final binder = decoded.firstWhere(
-      (e) => e["id"] == widget.binderId,
-    );
+    final binder = decoded
+        .map((e) => BinderModel.fromJson(e))
+        .firstWhere((b) => b.id == widget.binderId);
 
-    binderName = binder["name"];
-
-    nameController = TextEditingController(text: binderName);
-
-    setState(() {});
+    setState(() {
+      binderName = binder.name;
+      nameController = TextEditingController(text: binderName);
+    });
   }
 
-  Future<void> saveBinderName(String name) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final jsonString = prefs.getString("binders");
+  Future<void> _saveBinderName(String name) async {
+    final jsonString = await storage.getString("binders");
 
     if (jsonString == null) return;
 
@@ -67,77 +78,26 @@ class _BinderPageState extends State<BinderPage> {
       }
     }
 
-    await prefs.setString("binders", jsonEncode(decoded));
-
-    binderName = name;
+    await storage.setString("binders", jsonEncode(decoded));
 
     setState(() {
+      binderName = name;
       isEditing = false;
     });
   }
 
-  void openCardMenu(int index) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text("Replace image"),
-                onTap: () {
-                  Navigator.pop(context);
-                  viewModel.pickImage(index);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete),
-                title: const Text("Delete card"),
-                onTap: () {
-                  Navigator.pop(context);
-                  viewModel.deleteCard(index);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void onCardTap(int index) {
-    final action = viewModel.onCardTap(index);
-
-    if (action == CardAction.addImage) {
-      viewModel.pickImage(index);
-    }
-
-    if (action == CardAction.openMenu) {
-      openCardMenu(index);
-    }
-  }
-
-  Widget buildTitle() {
+  Widget _buildTitle() {
     if (isEditing) {
       return TextField(
         controller: nameController,
         autofocus: true,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-        ),
-        onSubmitted: (value) {
-          saveBinderName(value);
-        },
+        decoration: const InputDecoration(border: InputBorder.none),
+        onSubmitted: _saveBinderName,
       );
     }
 
     return GestureDetector(
-      onDoubleTap: () {
-        setState(() {
-          isEditing = true;
-        });
-      },
+      onDoubleTap: () => setState(() => isEditing = true),
       child: Text(
         binderName,
         style: const TextStyle(
@@ -148,33 +108,88 @@ class _BinderPageState extends State<BinderPage> {
     );
   }
 
+  void _onCardTap(int index) async {
+    final current = viewModel.pages[viewModel.currentPage][index];
+
+    if (current == null) {
+      await viewModel.pickImage(index);
+    } else {
+      _openCardMenu(index);
+    }
+  }
+
+  void _openCardMenu(int index) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text("Replace image"),
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.pickImage(index);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text("Delete card"),
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.deleteCard(index);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: viewModel,
-      builder: (context, _) {
-        if (viewModel.isLoading) {
+    return ListenableBuilder(
+      listenable: viewModel,
+      builder: (_, __) {
+        if (viewModel.state == ViewState.loading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
+        if (viewModel.state == ViewState.error) {
+          return const Scaffold(
+            body: Center(child: Text("Erro ao carregar binder")),
+          );
+        }
+
         return Scaffold(
           backgroundColor: const Color(0xFFF4EFEA),
+
           appBar: AppBar(
-            title: buildTitle(),
+            title: _buildTitle(),
             backgroundColor: const Color(0xFFF4EFEA),
             elevation: 0,
           ),
-          body: Center(
-            child: BinderWidget(
-              cards: viewModel.cards,
-              onCardTap: onCardTap,
-              onReorder: viewModel.reorderCards, 
-              onNextPage: viewModel.nextPage,
-              onPreviousPage: viewModel.previousPage,
-              hasPreviousPage: viewModel.hasPreviousPage,
-            ),
+
+          body: FutureBuilder<List<File?>>(
+            future: viewModel.cards,
+            builder: (_, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return Center(
+                child: BinderWidget(
+                  cards: snapshot.data!,
+                  onCardTap: _onCardTap,
+                  onReorder: viewModel.reorderCards,
+                  onNextPage: viewModel.nextPage,
+                  onPreviousPage: viewModel.previousPage,
+                  hasPreviousPage: viewModel.hasPreviousPage,
+                ),
+              );
+            },
           ),
         );
       },

@@ -1,16 +1,28 @@
 class BinderModel {
-
   final String id;
-  String name;
-  int cardCount;
-  String? preview;
+  final String name;
+  final int cardCount;
+  final String? preview;
 
-  BinderModel({
+  const BinderModel({
     required this.id,
     required this.name,
     this.cardCount = 0,
     this.preview,
   });
+
+  BinderModel copyWith({
+    String? name,
+    int? cardCount,
+    String? preview,
+  }) {
+    return BinderModel(
+      id: id,
+      name: name ?? this.name,
+      cardCount: cardCount ?? this.cardCount,
+      preview: preview ?? this.preview,
+    );
+  }
 
   factory BinderModel.fromJson(Map<String, dynamic> json) {
     return BinderModel(
@@ -29,5 +41,4 @@ class BinderModel {
       "preview": preview,
     };
   }
-
 }

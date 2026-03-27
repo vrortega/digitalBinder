@@ -1,97 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/binder_model.dart';
-import 'dart:io';
-import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
+import '../repositories/binder_repository.dart';
+import '../services/image_service.dart';
+
+enum ViewState { loading, success, error }
 
 class HomeViewModel extends ChangeNotifier {
+  final BinderRepository repository;
+  final ImageService imageService;
 
-  List<BinderModel> binders = [];
-
-  bool isLoading = true;
-
-  HomeViewModel() {
+  HomeViewModel({
+    required this.repository,
+    required this.imageService,
+  }) {
     loadBinders();
   }
 
+  List<BinderModel> _binders = [];
+  List<BinderModel> get binders => _binders;
+
+  ViewState _state = ViewState.loading;
+  ViewState get state => _state;
+
   Future<void> loadBinders() async {
+    try {
+      _state = ViewState.loading;
+      notifyListeners();
 
-    final prefs = await SharedPreferences.getInstance();
+      _binders = await repository.loadBinders();
 
-    final jsonString = prefs.getString("binders");
-
-    if (jsonString != null) {
-      final List decoded = jsonDecode(jsonString);
-
-      binders = decoded
-          .map((e) => BinderModel.fromJson(e))
-          .toList();
+      _state = ViewState.success;
+    } catch (_) {
+      _state = ViewState.error;
     }
 
-    isLoading = false;
     notifyListeners();
   }
 
-  Future<void> deleteBinder(String binderId) async {
+Future<void> deleteBinder(String binderId) async {
+  try {
+    final pages = await repository.getBinderPages(binderId);
 
-    final prefs = await SharedPreferences.getInstance();
-
-    final binderData = prefs.getString('binder_$binderId');
-
-    if (binderData != null) {
-
-      final decoded = jsonDecode(binderData);
-
-      final directory = await getApplicationDocumentsDirectory();
-
-      for (var page in decoded) {
-        for (var fileName in page) {
-
-          if (fileName != null) {
-            final file = File(
-              '${directory.path}/binder_images/$fileName',
-            );
-
-            if (await file.exists()) {
-              await file.delete();
-            }
-          }
-        }
-      }
+    if (pages != null) {
+      await imageService.deleteImagesFromBinder(pages);
     }
 
-    await prefs.remove('binder_$binderId');
+    await repository.deleteBinder(binderId);
 
-    binders.removeWhere((b) => b.id == binderId);
+    _binders = _binders.where((b) => b.id != binderId).toList();
 
-    await prefs.setString(
-      "binders",
-      jsonEncode(binders.map((e) => e.toJson()).toList()),
-    );
+    await repository.saveBinders(_binders);
 
     notifyListeners();
+  } catch (_) {
+    _state = ViewState.error;
+    notifyListeners();
   }
+}
 
   Future<BinderModel> createBinder() async {
-
-    final prefs = await SharedPreferences.getInstance();
-
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-
-    final binder = BinderModel(
-      id: id,
-      name: "New Binder",
-      cardCount: 0,
-      preview: null,
-    );
-
-    binders.add(binder);
-
-    await prefs.setString(
-      "binders",
-      jsonEncode(binders.map((e) => e.toJson()).toList()),
-    );
+    final binder = await repository.createBinder(_binders);
 
     notifyListeners();
 
