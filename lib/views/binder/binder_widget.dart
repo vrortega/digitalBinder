@@ -3,7 +3,6 @@ import 'dart:io';
 import 'photo_card.dart';
 
 class BinderWidget extends StatelessWidget {
-
   final List<File?> cards;
   final Function(int index) onCardTap;
   final Function(int oldIndex, int newIndex) onReorder;
@@ -26,12 +25,14 @@ class BinderWidget extends StatelessWidget {
       onAcceptWithDetails: (details) {
         final fromIndex = details.data;
 
+        // 🔒 proteção extra: não deixa mover slot vazio
+        if (cards[fromIndex] == null) return;
+
         if (fromIndex != index) {
           onReorder(fromIndex, index);
         }
       },
       builder: (context, candidateData, rejectedData) {
-
         final isHovering = candidateData.isNotEmpty;
 
         return AnimatedContainer(
@@ -43,34 +44,39 @@ class BinderWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
 
-          child: Draggable<int>(
-            data: index,
+          child: cards[index] != null
+              ? Draggable<int>(
+                  data: index,
 
-            feedback: Material(
-              color: Colors.transparent,
-              child: SizedBox(
-                width: 100,
-                height: 140,
-                child: PhotoCard(
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: SizedBox(
+                      width: 100,
+                      height: 140,
+                      child: PhotoCard(
+                        image: cards[index],
+                        onTap: () {},
+                      ),
+                    ),
+                  ),
+
+                  childWhenDragging: Opacity(
+                    opacity: 0.3,
+                    child: PhotoCard(
+                      image: cards[index],
+                      onTap: () => onCardTap(index),
+                    ),
+                  ),
+
+                  child: PhotoCard(
+                    image: cards[index],
+                    onTap: () => onCardTap(index),
+                  ),
+                )
+              : PhotoCard(
                   image: cards[index],
-                  onTap: () {},
+                  onTap: () => onCardTap(index),
                 ),
-              ),
-            ),
-
-            childWhenDragging: Opacity(
-              opacity: 0.3,
-              child: PhotoCard(
-                image: cards[index],
-                onTap: () => onCardTap(index),
-              ),
-            ),
-
-            child: PhotoCard(
-              image: cards[index],
-              onTap: () => onCardTap(index),
-            ),
-          ),
         );
       },
     );
@@ -78,15 +84,12 @@ class BinderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       color: const Color(0xFFF4EFEA),
-
       child: Center(
         child: Stack(
           alignment: Alignment.center,
           children: [
-
             Container(
               width: 320,
               height: 480,
@@ -95,10 +98,8 @@ class BinderWidget extends StatelessWidget {
                 color: const Color(0xFFF9F7F5),
                 borderRadius: BorderRadius.circular(28),
               ),
-
               child: Row(
                 children: [
-
                   Expanded(
                     child: Column(
                       children: [
@@ -108,9 +109,7 @@ class BinderWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   const SizedBox(width: 16),
-
                   Expanded(
                     child: Column(
                       children: [
@@ -120,7 +119,6 @@ class BinderWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
