@@ -8,7 +8,13 @@ This project was created to practice **Flutter architecture, UI composition, and
 
 # Preview
 
-https://github.com/user-attachments/assets/55d8b14d-376e-4309-966a-b7bc790a889f
+
+https://github.com/user-attachments/assets/2bd132bc-08c0-4303-b0e4-1acf0f633efd
+
+
+
+
+
 
 # ✨ Features
 
