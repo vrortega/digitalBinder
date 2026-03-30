@@ -14,30 +14,65 @@ https://github.com/user-attachments/assets/24619f56-bdb6-4d39-9a5f-fa569b0b2e04
 
 # ✨ Features
 
-## 📖 Binder System
+## 📖 Binder Management
 
-- Create multiple **photocard binders**
-- Each binder contains **multiple pages**
-- Each page has **4 card slots**
-- Swipe navigation between pages
-
-Users can:
-
-- ➕ Add an image to an empty card slot
-- 🔄 Replace an existing photocard
-- 🗑 Delete a photocard
-- 📂 Persist cards locally
-
-Images are selected using the device gallery via **image_picker**.
+- Create **multiple binders**
+- Edit binder name ✏️
+- Delete binders 🗑️
+- Persist binders locally
 
 ---
 
-# ⚙️ Tech Stack
+## 🃏 Photocard System
+
+- Each binder contains **multiple pages**
+- Each page contains **4 card slots**
+- Add, replace, or delete cards
+- Local image persistence
+
+---
+
+## 🎯 Interactions
+
+- Drag and drop cards to reorder 🔄
+- Navigate between pages
+- Dynamic page creation
+- Smooth UI interactions
+
+---
+
+## ⚙️ Tech Stack
+
+## 📱 Core
+
 - Flutter
 - Dart
-- image_picker
-- path_provider
-- shared_preferences
+
+## 🧠 Architecture
+
+- MVVM (Model–View–ViewModel)
+- ChangeNotifier (state management)
+
+## 📦 Packages
+
+- image_picker → image selection
+- shared_preferences → local data storage
+- path_provider → file system access
+
+## 🧪 Testing
+
+- flutter_test
+- mocktail
+
+## 🎨 UI
+
+- Material Design
+- Custom fonts (Sora)
+
+## 🚀 Dev Tools
+
+- flutter_lints
+- flutter_native_splash
 
 ---
 
@@ -50,12 +85,17 @@ The project follows a **Model–View–ViewModel (MVVM)** structure:
 | **Model** | Data structure of the binder |
 | **ViewModel** | Business logic and state handling |
 | **Views** | UI screens |
-| **Widgets** | Reusable UI components |
-
-This separation keeps the code **clean, testable, and scalable**.
+| **Services** | External operations (Storage, image handling) |
+| **Repository** | Data persistence layer |
 
 ---
 
+# 🛣️ Future Improvements
+- 🚀 Publish app on Google Play
+- ⭐ Add "favorite photocard" feature (priority tracking for purchases)
+- 🎨 UI/UX refinements
+  
+---
 
 ## 🚀 Getting Started
 
@@ -75,4 +115,10 @@ cd digital_binder
 
 ```bash
 flutter pub get
+```
+
+### 4️⃣ Run the app
+
+```bash
+flutter run
 ```
