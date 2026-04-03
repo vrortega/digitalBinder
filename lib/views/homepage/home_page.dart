@@ -4,6 +4,7 @@ import '../binder/binder_page.dart';
 import '../binder/binder_previewcard.dart';
 import '../../repositories/binder_repository.dart';
 import '../../services/image_service.dart';
+import 'package:digital_binder/widgets/primary_fab.dart';
 
 class HomePage extends StatefulWidget {
   final BinderRepository repository;
@@ -72,10 +73,8 @@ class _HomePageState extends State<HomePage> {
         return Scaffold(
           backgroundColor: const Color(0xFFF4EFEA),
           body: _buildBody(),
-          floatingActionButton: FloatingActionButton(
+          floatingActionButton: PrimaryFab(
             onPressed: _onCreateBinder,
-            backgroundColor: const Color(0xFFD8CFC7),
-            child: const Icon(Icons.add),
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
