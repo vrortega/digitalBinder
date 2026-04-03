@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:digital_binder/viewmodels/binder_viewmodel.dart';
 import 'package:digital_binder/views/binder/binder_widget.dart';
+import 'package:digital_binder/widgets/binder_pagination_widget.dart';
 
 import '../../services/image_service.dart';
 import '../../services/storage_service.dart';
@@ -179,15 +180,24 @@ class _BinderPageState extends State<BinderPage> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              return Center(
-                child: BinderWidget(
-                  cards: snapshot.data!,
-                  onCardTap: _onCardTap,
-                  onReorder: viewModel.reorderCards,
-                  onNextPage: viewModel.nextPage,
-                  onPreviousPage: viewModel.previousPage,
-                  hasPreviousPage: viewModel.hasPreviousPage,
-                ),
+              return Stack(
+                children: [
+                  Center(
+                    child: BinderWidget(
+                      cards: snapshot.data!,
+                      onCardTap: _onCardTap,
+                      onReorder: viewModel.reorderCards,
+                      onNextPage: viewModel.nextPage,
+                      onPreviousPage: viewModel.previousPage,
+                      hasPreviousPage: viewModel.hasPreviousPage,
+                    ),
+                  ),
+
+                  BinderPaginationWidget(
+                    currentPage: viewModel.currentPage,
+                    totalPages: viewModel.pages.length,
+                  ),
+                ],
               );
             },
           ),
