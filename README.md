@@ -94,6 +94,13 @@ The project follows a **Model–View–ViewModel (MVVM)** structure:
 
 ---
 
+# 🔄 Updates
+## 🆕 Latest Improvements
+- Added page counter indicator to binder
+- Improved UI and user experience
+
+---
+
 # 🛣️ Future Improvements
 - 🚀 Publish app on Google Play
 - ⭐ Add "favorite photocard" feature (priority tracking for purchases)
