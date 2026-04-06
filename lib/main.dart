@@ -3,6 +3,7 @@ import 'views/homepage/home_page.dart';
 import 'repositories/binder_repository.dart';
 import 'services/image_service.dart';
 import 'services/storage_service.dart';
+import './theme/app_colors.dart';
 
 void main() {
   final storage = StorageService();
@@ -31,11 +32,11 @@ class DigitalBinderApp extends StatelessWidget {
       title: 'DigiBinder',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFFDFBFF),
+        scaffoldBackgroundColor: AppColors.background,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFFDAF4),
+          seedColor: AppColors.primary,
         ).copyWith(
-          surface: const Color(0xFFFDFBFF),
+          surface: AppColors.background,
         ),
       ),
       home: HomePage(

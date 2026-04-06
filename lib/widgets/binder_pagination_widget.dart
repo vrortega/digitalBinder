@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class BinderPaginationWidget extends StatelessWidget {
   final int currentPage;
@@ -20,7 +21,7 @@ class BinderPaginationWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.6),
+          color: AppColors.textPrimary.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(12),
         ),
         child: AnimatedSwitcher(
@@ -29,7 +30,7 @@ class BinderPaginationWidget extends StatelessWidget {
             "${currentPage + 1} / $totalPages",
             key: ValueKey(currentPage),
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.background,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),

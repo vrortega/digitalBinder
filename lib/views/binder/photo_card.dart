@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import '../../theme/app_colors.dart';
 
 class PhotoCard extends StatelessWidget {
 
@@ -20,7 +21,7 @@ class PhotoCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFE0E0E0),
+            color: AppColors.textSecondary,
           borderRadius: BorderRadius.circular(10),
           image: image != null
               ? DecorationImage(

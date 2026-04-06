@@ -12,6 +12,7 @@ import '../../services/binder_service.dart';
 import '../../repositories/binder_repository.dart';
 import '../../models/binder_model.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../theme/app_colors.dart';
 
 class BinderPage extends StatefulWidget {
   final String binderId;
@@ -165,12 +166,12 @@ class _BinderPageState extends State<BinderPage> {
         }
 
         return Scaffold(
-        backgroundColor: const Color(0xFFFDFBFF),
+        backgroundColor: AppColors.background,
 
 
           appBar: AppBar(
             title: _buildTitle(),
-            backgroundColor: const Color(0xFFFDFBFF),
+            backgroundColor: AppColors.background,
             elevation: 0,
           ),
 

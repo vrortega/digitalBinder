@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'photo_card.dart';
+import '../../theme/app_colors.dart';
 
 class BinderWidget extends StatelessWidget {
   final List<File?> cards;
@@ -38,7 +39,7 @@ class BinderWidget extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             border: isHovering
-                ? Border.all(color: Colors.grey, width: 2)
+                ? Border.all(color: AppColors.border, width: 2)
                 : null,
             borderRadius: BorderRadius.circular(10),
           ),
@@ -80,10 +81,10 @@ class BinderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFFDFBFF),
+    color: AppColors.background,
       child: Center(
         child: SizedBox(
-          width: 380, 
+          width: 380,
           height: 480,
           child: Stack(
             alignment: Alignment.center,
@@ -93,7 +94,7 @@ class BinderWidget extends StatelessWidget {
                 height: 480,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9F7F5),
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(28),
                 ),
                 child: Row(
@@ -120,17 +121,18 @@ class BinderWidget extends StatelessWidget {
                   ],
                 ),
               ),
-
               if (hasPreviousPage)
                 Positioned(
                   left: -5,
                   child: IconButton(
                     iconSize: 20,
-                    icon: const Icon(Icons.arrow_back_ios),
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: AppColors.textPrimary,
+                    ),
                     onPressed: onPreviousPage,
                   ),
                 ),
-
               Positioned(
                 right: -5,
                 child: IconButton(

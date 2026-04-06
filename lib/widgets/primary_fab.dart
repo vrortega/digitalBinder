@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:digital_binder/theme/app_colors.dart';
 
 class PrimaryFab extends StatefulWidget {
   final VoidCallback onPressed;
@@ -35,7 +36,7 @@ class _PrimaryFabState extends State<PrimaryFab> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: const Color(0xFFF798E0),
+            color: AppColors.accent,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(

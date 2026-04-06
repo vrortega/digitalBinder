@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../models/binder_model.dart';
+import '../../theme/app_colors.dart';
 
 class BinderCardWidget extends StatelessWidget {
 
@@ -29,7 +30,6 @@ class BinderCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Dismissible(
       key: ValueKey(binder.id),
       direction: DismissDirection.endToStart,
@@ -43,7 +43,7 @@ class BinderCardWidget extends StatelessWidget {
         padding: const EdgeInsets.only(right: 20),
         alignment: Alignment.centerRight,
         decoration: BoxDecoration(
-          color: Colors.red,
+        color: AppColors.error,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(Icons.delete, color: Colors.white),
@@ -56,7 +56,7 @@ class BinderCardWidget extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9F7F5),
+           color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
           ),
 
@@ -68,7 +68,8 @@ class BinderCardWidget extends StatelessWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[200],
+                   color: AppColors.surface,
+                  border: Border.all(color: AppColors.border),
                 ),
 
                 child: FutureBuilder<File?>(
@@ -101,6 +102,7 @@ class BinderCardWidget extends StatelessWidget {
                       fontFamily: "Sora",
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
                     ),
                   ),
 
@@ -108,7 +110,9 @@ class BinderCardWidget extends StatelessWidget {
 
                   Text(
                     "${binder.cardCount} cards",
-                    style: const TextStyle(color: Colors.grey),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               )
