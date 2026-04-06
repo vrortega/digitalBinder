@@ -165,11 +165,12 @@ class _BinderPageState extends State<BinderPage> {
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF4EFEA),
+        backgroundColor: const Color(0xFFFDFBFF),
+
 
           appBar: AppBar(
             title: _buildTitle(),
-            backgroundColor: const Color(0xFFF4EFEA),
+            backgroundColor: const Color(0xFFFDFBFF),
             elevation: 0,
           ),
 

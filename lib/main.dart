@@ -28,10 +28,15 @@ class DigitalBinderApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Digital Binder',
+      title: 'DigiBinder',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        scaffoldBackgroundColor: const Color(0xFFFDFBFF),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFFDAF4),
+        ).copyWith(
+          surface: const Color(0xFFFDFBFF),
+        ),
       ),
       home: HomePage(
         repository: repository,

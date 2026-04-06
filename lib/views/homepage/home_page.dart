@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
       listenable: viewModel,
       builder: (_, __) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF4EFEA),
+          backgroundColor: const Color(0xFFFDFBFF),
           body: _buildBody(),
           floatingActionButton: PrimaryFab(
             onPressed: _onCreateBinder,

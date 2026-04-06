@@ -80,7 +80,7 @@ class BinderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF4EFEA),
+      color: const Color(0xFFFDFBFF),
       child: Center(
         child: SizedBox(
           width: 380, 
