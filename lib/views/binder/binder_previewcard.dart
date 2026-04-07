@@ -111,7 +111,7 @@ class BinderCardWidget extends StatelessWidget {
                   Text(
                     "${binder.cardCount} cards",
                     style: const TextStyle(
-                      color: AppColors.textSecondary,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],

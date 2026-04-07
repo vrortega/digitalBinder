@@ -9,6 +9,7 @@ class BinderWidget extends StatelessWidget {
   final Function(int oldIndex, int newIndex) onReorder;
   final VoidCallback onNextPage;
   final VoidCallback onPreviousPage;
+  final bool Function(String fileName) isFavorite;
   final bool hasPreviousPage;
 
   const BinderWidget({
@@ -18,10 +19,13 @@ class BinderWidget extends StatelessWidget {
     required this.onReorder,
     required this.onNextPage,
     required this.onPreviousPage,
+    required this.isFavorite,
     required this.hasPreviousPage,
   });
 
   Widget buildDraggableCard(int index) {
+    final file = cards[index];
+
     return DragTarget<int>(
       onAcceptWithDetails: (details) {
         final fromIndex = details.data;
@@ -43,34 +47,47 @@ class BinderWidget extends StatelessWidget {
                 : null,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: cards[index] != null
+          child: file != null
               ? Draggable<int>(
                   data: index,
+
                   feedback: Material(
                     color: Colors.transparent,
                     child: SizedBox(
                       width: 100,
                       height: 140,
                       child: PhotoCard(
-                        image: cards[index],
+                        image: file,
+                        isFavorite: isFavorite(
+                          file.path.split('/').last,
+                        ),
                         onTap: () {},
                       ),
                     ),
                   ),
+
                   childWhenDragging: Opacity(
                     opacity: 0.3,
                     child: PhotoCard(
-                      image: cards[index],
+                      image: file,
+                      isFavorite: isFavorite(
+                        file.path.split('/').last,
+                      ),
                       onTap: () => onCardTap(index),
                     ),
                   ),
+
                   child: PhotoCard(
-                    image: cards[index],
+                    image: file,
+                    isFavorite: isFavorite(
+                      file.path.split('/').last,
+                    ),
                     onTap: () => onCardTap(index),
                   ),
                 )
+
               : PhotoCard(
-                  image: cards[index],
+                  image: file,
                   onTap: () => onCardTap(index),
                 ),
         );
@@ -81,7 +98,7 @@ class BinderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-    color: AppColors.background,
+      color: AppColors.background,
       child: Center(
         child: SizedBox(
           width: 380,

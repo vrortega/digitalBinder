@@ -36,7 +36,7 @@ class _PrimaryFabState extends State<PrimaryFab> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppColors.accent,
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(

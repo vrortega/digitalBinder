@@ -121,6 +121,12 @@ class _BinderPageState extends State<BinderPage> {
   }
 
   void _openCardMenu(int index) {
+    final current = viewModel.pages[viewModel.currentPage][index];
+
+    if (current == null) return;
+
+    final isFav = viewModel.isFavorite(current);
+
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -132,6 +138,16 @@ class _BinderPageState extends State<BinderPage> {
               onTap: () {
                 Navigator.pop(context);
                 viewModel.pickImage(index);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                isFav ? Icons.star : Icons.star_border,
+              ),
+              title: Text(isFav ? "Unfavorite card" : "Favorite card"),
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.toggleFavorite(index);
               },
             ),
             ListTile(
@@ -166,15 +182,12 @@ class _BinderPageState extends State<BinderPage> {
         }
 
         return Scaffold(
-        backgroundColor: AppColors.background,
-
-
+          backgroundColor: AppColors.background,
           appBar: AppBar(
             title: _buildTitle(),
             backgroundColor: AppColors.background,
             elevation: 0,
           ),
-
           body: FutureBuilder<List<File?>>(
             future: viewModel.cards,
             builder: (_, snapshot) {
@@ -192,9 +205,11 @@ class _BinderPageState extends State<BinderPage> {
                       onNextPage: viewModel.nextPage,
                       onPreviousPage: viewModel.previousPage,
                       hasPreviousPage: viewModel.hasPreviousPage,
+
+                      isFavorite: (fileName) =>
+                          viewModel.isFavorite(fileName),
                     ),
                   ),
-
                   BinderPaginationWidget(
                     currentPage: viewModel.currentPage,
                     totalPages: viewModel.pages.length,

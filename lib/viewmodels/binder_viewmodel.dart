@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../repositories/binder_repository.dart';
@@ -28,11 +29,47 @@ class BinderViewModel extends ChangeNotifier {
   int _currentPage = 0;
   ViewState _state = ViewState.loading;
 
+  final Set<String> _favorites = {};
+
   List<List<String?>> get pages => _pages;
   int get currentPage => _currentPage;
   ViewState get state => _state;
 
   bool get hasPreviousPage => _currentPage > 0;
+
+  bool isFavorite(String fileName) => _favorites.contains(fileName);
+
+  String get _favoritesKey => 'favorites_$binderId';
+
+  Future<void> _loadFavorites() async {
+    final json = await repository.storage.getString(_favoritesKey);
+
+    if (json == null) return;
+
+    final List decoded = jsonDecode(json);
+    _favorites.addAll(decoded.cast<String>());
+  }
+
+  Future<void> _saveFavorites() async {
+    await repository.storage.setString(
+      _favoritesKey,
+      jsonEncode(_favorites.toList()),
+    );
+  }
+
+  void toggleFavorite(int index) async {
+    final fileName = _pages[_currentPage][index];
+    if (fileName == null) return;
+
+    if (_favorites.contains(fileName)) {
+      _favorites.remove(fileName);
+    } else {
+      _favorites.add(fileName);
+    }
+
+    await _saveFavorites(); // 🔥 salva
+    notifyListeners();
+  }
 
   Future<void> loadBinder() async {
     try {
@@ -43,6 +80,8 @@ class BinderViewModel extends ChangeNotifier {
       if (data != null) {
         _pages = data;
       }
+
+      await _loadFavorites(); // 🔥 carrega favoritos
 
       _state = ViewState.success;
     } catch (_) {
@@ -63,11 +102,9 @@ class BinderViewModel extends ChangeNotifier {
 
   Future<void> pickImage(int index) async {
     final file = await pickerService.pickImage();
-
     if (file == null) return;
 
     final fileName = await imageService.saveImage(file);
-
     _pages[_currentPage][index] = fileName;
 
     await _persist();
@@ -78,6 +115,8 @@ class BinderViewModel extends ChangeNotifier {
 
     if (fileName != null) {
       await imageService.deleteImage(fileName);
+      _favorites.remove(fileName);
+      await _saveFavorites(); 
     }
 
     _pages[_currentPage][index] = null;
@@ -96,27 +135,27 @@ class BinderViewModel extends ChangeNotifier {
   }
 
   Future<void> _persist() async {
-  await repository.saveBinder(binderId, _pages);
+    await repository.saveBinder(binderId, _pages);
 
-  final cardCount = binderService.calculateCardCount(_pages);
-  final preview = binderService.getPreview(_pages);
+    final cardCount = binderService.calculateCardCount(_pages);
+    final preview = binderService.getPreview(_pages);
 
-  final binders = await repository.loadBinders();
+    final binders = await repository.loadBinders();
 
-  final updated = binders.map((binder) {
-    if (binder.id == binderId) {
-      return binder.copyWith(
-        cardCount: cardCount,
-        preview: preview,
-      );
-    }
-    return binder;
-  }).toList();
+    final updated = binders.map((binder) {
+      if (binder.id == binderId) {
+        return binder.copyWith(
+          cardCount: cardCount,
+          preview: preview,
+        );
+      }
+      return binder;
+    }).toList();
 
-  await repository.saveBinders(updated);
+    await repository.saveBinders(updated);
 
-  notifyListeners();
-}
+    notifyListeners();
+  }
 
   void nextPage() {
     if (_currentPage == _pages.length - 1) {
