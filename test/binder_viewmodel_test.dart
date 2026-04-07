@@ -8,12 +8,15 @@ import 'package:digital_binder/repositories/binder_repository.dart';
 import 'package:digital_binder/services/image_service.dart';
 import 'package:digital_binder/services/picker_service.dart';
 import 'package:digital_binder/services/binder_service.dart';
+import 'package:digital_binder/services/camera_service.dart';
 import 'package:digital_binder/models/binder_model.dart';
 
 class MockBinderRepository extends Mock implements BinderRepository {}
 class MockImageService extends Mock implements ImageService {}
 class MockPickerService extends Mock implements PickerService {}
 class MockBinderService extends Mock implements BinderService {}
+class MockCameraService extends Mock implements CameraService {}
+
 
 class FakeFile extends Fake implements File {}
 
@@ -22,6 +25,7 @@ void main() {
   late MockImageService imageService;
   late MockPickerService pickerService;
   late MockBinderService binderService;
+  late MockCameraService cameraService;
 
   late BinderViewModel viewModel;
 
@@ -34,6 +38,7 @@ void main() {
       imageService: imageService,
       pickerService: pickerService,
       binderService: binderService,
+      cameraService: cameraService,
     );
   }
 
@@ -75,6 +80,7 @@ void main() {
     imageService = MockImageService();
     pickerService = MockPickerService();
     binderService = MockBinderService();
+    cameraService = MockCameraService();
 
     mockDefaultBehaviors();
     viewModel = createViewModel();

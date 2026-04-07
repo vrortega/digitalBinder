@@ -9,6 +9,7 @@ import '../../services/image_service.dart';
 import '../../services/storage_service.dart';
 import '../../services/picker_service.dart';
 import '../../services/binder_service.dart';
+import '../../services/camera_service.dart';
 import '../../repositories/binder_repository.dart';
 import '../../models/binder_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -45,6 +46,7 @@ class _BinderPageState extends State<BinderPage> {
       imageService: ImageService(),
       pickerService: PickerService(ImagePicker()),
       binderService: BinderService(),
+     cameraService: CameraService(ImagePicker()),
     );
 
     _loadBinderName();
@@ -140,6 +142,15 @@ class _BinderPageState extends State<BinderPage> {
                 viewModel.pickImage(index);
               },
             ),
+
+            ListTile(
+          leading: const Icon(Icons.camera_alt),
+          title: const Text("Scan card"),
+          onTap: () async {
+            Navigator.pop(context);
+            await viewModel.scanCard(index);
+          },
+        ),
             ListTile(
               leading: Icon(
                 isFav ? Icons.star : Icons.star_border,

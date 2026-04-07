@@ -5,6 +5,7 @@ import '../repositories/binder_repository.dart';
 import '../services/image_service.dart';
 import '../services/picker_service.dart';
 import '../services/binder_service.dart';
+import '../services/camera_service.dart';
 
 enum ViewState { loading, success, error }
 
@@ -14,6 +15,7 @@ class BinderViewModel extends ChangeNotifier {
   final ImageService imageService;
   final PickerService pickerService;
   final BinderService binderService;
+  final CameraService cameraService;
 
   BinderViewModel({
     required this.binderId,
@@ -21,6 +23,7 @@ class BinderViewModel extends ChangeNotifier {
     required this.imageService,
     required this.pickerService,
     required this.binderService,
+    required this.cameraService,
   }) {
     loadBinder();
   }
@@ -81,7 +84,7 @@ class BinderViewModel extends ChangeNotifier {
         _pages = data;
       }
 
-      await _loadFavorites(); // 🔥 carrega favoritos
+      await _loadFavorites(); 
 
       _state = ViewState.success;
     } catch (_) {
@@ -156,6 +159,17 @@ class BinderViewModel extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future<void> scanCard(int index) async {
+  final file = await cameraService.scanCard();
+  if (file == null) return;
+
+  final fileName = await imageService.saveImage(file);
+
+  _pages[_currentPage][index] = fileName;
+
+  await _persist();
+}
 
   void nextPage() {
     if (_currentPage == _pages.length - 1) {
