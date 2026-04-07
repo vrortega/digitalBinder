@@ -46,7 +46,9 @@ class _PhotoCardState extends State<PhotoCard>
   void didUpdateWidget(covariant PhotoCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.isFavorite && !oldWidget.isFavorite) {
+    final becameFavorite = widget.isFavorite && !oldWidget.isFavorite;
+
+    if (becameFavorite && mounted) {
       _controller.forward(from: 0);
     }
   }
@@ -85,7 +87,6 @@ class _PhotoCardState extends State<PhotoCard>
                   )
                 : null,
           ),
-
           Positioned(
             top: 5,
             right: 5,
@@ -109,14 +110,12 @@ class _PhotoCardState extends State<PhotoCard>
                           ),
                         ),
                       ),
-
                       Icon(
                         Icons.star,
                         size: 30,
                         color: AppColors.background
                             .withValues(alpha: 0.3 + (_glow.value * 0.3)),
                       ),
-
                       Transform.scale(
                         scale: widget.isFavorite ? _pulse.value : 1,
                         child: const Icon(

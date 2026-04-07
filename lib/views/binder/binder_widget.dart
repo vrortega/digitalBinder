@@ -57,6 +57,7 @@ class BinderWidget extends StatelessWidget {
                       width: 100,
                       height: 140,
                       child: PhotoCard(
+                        key: ValueKey(file.path),
                         image: file,
                         isFavorite: isFavorite(
                           file.path.split('/').last,
@@ -69,6 +70,7 @@ class BinderWidget extends StatelessWidget {
                   childWhenDragging: Opacity(
                     opacity: 0.3,
                     child: PhotoCard(
+                      key: ValueKey(file.path),
                       image: file,
                       isFavorite: isFavorite(
                         file.path.split('/').last,
@@ -78,6 +80,7 @@ class BinderWidget extends StatelessWidget {
                   ),
 
                   child: PhotoCard(
+                    key: ValueKey(file.path),
                     image: file,
                     isFavorite: isFavorite(
                       file.path.split('/').last,
