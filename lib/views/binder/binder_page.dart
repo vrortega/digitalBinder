@@ -32,8 +32,8 @@ class _BinderPageState extends State<BinderPage> {
 
   String binderName = "New Binder";
   bool isEditing = false;
-  late TextEditingController nameController;
 
+  final TextEditingController nameController = TextEditingController();
   final storage = StorageService();
 
   @override
@@ -46,129 +46,174 @@ class _BinderPageState extends State<BinderPage> {
       imageService: ImageService(),
       pickerService: PickerService(ImagePicker()),
       binderService: BinderService(),
-     cameraService: CameraService(ImagePicker()),
+      cameraService: CameraService(ImagePicker()),
     );
 
     _loadBinderName();
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadBinderName() async {
     final jsonString = await storage.getString("binders");
-
     if (jsonString == null) return;
 
     final List decoded = jsonDecode(jsonString);
 
-    final binder = decoded
-        .map((e) => BinderModel.fromJson(e))
-        .firstWhere((b) => b.id == widget.binderId);
+    try {
+      final binder = decoded
+          .map((e) => BinderModel.fromJson(e))
+          .firstWhere((b) => b.id == widget.binderId);
 
-    setState(() {
-      binderName = binder.name;
-      nameController = TextEditingController(text: binderName);
-    });
+      if (!mounted) return;
+
+      setState(() {
+        binderName = binder.name;
+        nameController.text = binderName;
+      });
+    } catch (_) {
+      nameController.text = binderName;
+    }
   }
 
   Future<void> _saveBinderName(String name) async {
-    final jsonString = await storage.getString("binders");
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
 
+    final jsonString = await storage.getString("binders");
     if (jsonString == null) return;
 
     List decoded = jsonDecode(jsonString);
 
     for (var binder in decoded) {
       if (binder["id"] == widget.binderId) {
-        binder["name"] = name;
+        binder["name"] = trimmed;
       }
     }
 
     await storage.setString("binders", jsonEncode(decoded));
 
+    if (!mounted) return;
+
     setState(() {
-      binderName = name;
+      binderName = trimmed;
       isEditing = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Binder name updated")),
+    );
+  }
+
+  void _cancelEditing() {
+    setState(() {
+      isEditing = false;
+      nameController.text = binderName;
     });
   }
 
   Widget _buildTitle() {
     if (isEditing) {
-      return TextField(
-        controller: nameController,
-        autofocus: true,
-        decoration: const InputDecoration(border: InputBorder.none),
-        onSubmitted: _saveBinderName,
+      return SizedBox(
+        width: 200,
+        child: TextField(
+          controller: nameController,
+          autofocus: true,
+          textAlign: TextAlign.center,
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+          ),
+          onSubmitted: _saveBinderName,
+        ),
       );
     }
 
-    return GestureDetector(
-      onDoubleTap: () => setState(() => isEditing = true),
-      child: Text(
-        binderName,
-        style: const TextStyle(
-          fontFamily: "Sora",
-          fontWeight: FontWeight.w400,
-        ),
+    return Text(
+      binderName,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(
+        fontFamily: "Sora",
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
       ),
     );
   }
 
-  void _onCardTap(int index) async {
-    final current = viewModel.pages[viewModel.currentPage][index];
-
-    if (current == null) {
-      await viewModel.pickImage(index);
-    } else {
-      _openCardMenu(index);
-    }
+  void _onCardTap(int index) {
+    _openCardMenu(index);
   }
 
   void _openCardMenu(int index) {
     final current = viewModel.pages[viewModel.currentPage][index];
-
-    if (current == null) return;
-
-    final isFav = viewModel.isFavorite(current);
+    final isEmpty = current == null;
+    final isFav = current != null && viewModel.isFavorite(current);
 
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
         child: Wrap(
           children: [
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text("Replace image"),
-              onTap: () {
-                Navigator.pop(context);
-                viewModel.pickImage(index);
-              },
-            ),
-
-            ListTile(
-          leading: const Icon(Icons.camera_alt),
-          title: const Text("Scan card"),
-          onTap: () async {
-            Navigator.pop(context);
-            await viewModel.scanCard(index);
-          },
-        ),
-            ListTile(
-              leading: Icon(
-                isFav ? Icons.star : Icons.star_border,
+            if (isEmpty) ...[
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text("Choose from gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  viewModel.pickImage(index);
+                },
               ),
-              title: Text(isFav ? "Unfavorite card" : "Favorite card"),
-              onTap: () {
-                Navigator.pop(context);
-                viewModel.toggleFavorite(index);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text("Delete card"),
-              onTap: () {
-                Navigator.pop(context);
-                viewModel.deleteCard(index);
-              },
-            ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Scan card"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await viewModel.scanCard(index);
+                },
+              ),
+            ],
+
+            if (!isEmpty) ...[
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text("Replace image"),
+                onTap: () {
+                  Navigator.pop(context);
+                  viewModel.pickImage(index);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Scan card"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await viewModel.scanCard(index);
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  isFav ? Icons.star : Icons.star_border,
+                ),
+                title: Text(
+                  isFav ? "Unfavorite card" : "Favorite card",
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  viewModel.toggleFavorite(index);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text("Delete card"),
+                onTap: () {
+                  Navigator.pop(context);
+                  viewModel.deleteCard(index);
+                },
+              ),
+            ],
           ],
         ),
       ),
@@ -195,9 +240,31 @@ class _BinderPageState extends State<BinderPage> {
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
+            centerTitle: true,
             title: _buildTitle(),
             backgroundColor: AppColors.background,
             elevation: 0,
+            actions: [
+              if (isEditing) ...[
+                IconButton(
+                  icon: const Icon(Icons.check),
+                  onPressed: () => _saveBinderName(nameController.text),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: _cancelEditing,
+                ),
+              ] else ...[
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    setState(() {
+                      isEditing = true;
+                    });
+                  },
+                ),
+              ],
+            ],
           ),
           body: FutureBuilder<List<File?>>(
             future: viewModel.cards,
@@ -216,7 +283,6 @@ class _BinderPageState extends State<BinderPage> {
                       onNextPage: viewModel.nextPage,
                       onPreviousPage: viewModel.previousPage,
                       hasPreviousPage: viewModel.hasPreviousPage,
-
                       isFavorite: (fileName) =>
                           viewModel.isFavorite(fileName),
                     ),
